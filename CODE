@@ -1,0 +1,109 @@
+const int ledpin=13;  // ledpin and soundpin are not changed throughout the process
+const int soundpin=A2;
+const int threshold=100;  // sets threshold value for sound sensor
+#include <Servo.h>             //Servo library
+ 
+Servo servo_test;        //initialize a servo object for the connected servo  
+#include <SoftwareSerial.h>
+
+SoftwareSerial mySerial(10,11);
+                
+int angle = 0;  
+int c=0;
+
+void setup()
+{
+ mySerial.begin(9600);  
+ servo_test.attach(9);
+Serial.begin(9600);
+pinMode(ledpin,OUTPUT);
+pinMode(soundpin,INPUT);
+ 
+
+}
+
+void loop() 
+{
+
+  
+  int soundsens=analogRead(soundpin);
+  Serial.println(soundsens);  // reads analog data from sound sensor
+if (soundsens>=threshold) 
+{
+  c=c+1;
+  if(c>10)
+{
+  SendMessage();
+}
+
+  
+  digitalWrite(ledpin,HIGH);
+ for(angle = 0; angle < 180; angle += 5)    // command to move from 0 degrees to 180 degrees 
+  {                                  
+    servo_test.write(angle);                 //command to rotate the servo to the specified angle
+    delay(15);                       
+  } 
+ 
+  delay(10);
+  
+  for(angle = 180; angle>=1; angle-=5)     // command to move from 180 degrees to 0 degrees 
+  {                                
+    servo_test.write(angle);              //command to rotate the servo to the specified angle
+    delay(15);                       
+  } 
+
+    delay(1000);
+   
+}
+else
+  {
+   digitalWrite(ledpin,0);
+    
+  }
+
+ 
+
+
+
+int sensorValue = analogRead(A0);
+  if(sensorValue<=800)
+  {
+    digitalWrite(ledpin,HIGH);
+    
+    SendMessage1();
+  }
+  else
+  {
+   digitalWrite(ledpin,0); 
+  }
+
+  
+}
+
+
+
+void SendMessage1(){
+
+  mySerial.println("AT+CMGF=1");     //Sets the GSM Module in Text Mode
+  delay(1000);   // Delay of 1000 milli seconds or 1 second
+  mySerial.println("AT+CMGS=\"+919846589187\"\r");   // Replace x with mobile number
+  delay(1000);
+  mySerial.println("mummyyyyyyy I peeeeeeeed");  // The SMS text you want to send
+  delay(100);
+   mySerial.println((char)26);  // ASCII code of CTRL+Z
+  delay(1000);
+}
+
+
+
+void SendMessage()
+{
+  mySerial.println("AT+CMGF=1");    //Sets the GSM Module in Text Mode
+  delay(1000);  // Delay of 1000 milli seconds or 1 second
+  mySerial.println("AT+CMGS=\"+919846589187\"\r");   // Replace x with mobile number
+  delay(1000);
+  mySerial.println("baby crying");  // The SMS text you want to send
+  delay(100);
+   mySerial.println((char)26);  // ASCII code of CTRL+Z
+  delay(1000);
+}
